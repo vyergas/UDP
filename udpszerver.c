@@ -1,10 +1,3 @@
-/* udpszerver.c
- * 
- * Egyszerű UDP példa.
- * A program fogadja az UDP csomagokat és kiírja a forrásukat és a tartalmukat.
- * 
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
