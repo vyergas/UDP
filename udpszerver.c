@@ -1,3 +1,10 @@
+/* udpszerver.c
+ * 
+ * Egyszerű UDP példa.
+ * A program fogadja az UDP csomagokat és kiírja a forrásukat és a tartalmukat.
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -57,28 +64,59 @@ int main()
   while(1) {
     if(len = recvfrom(sock, buf, sizeof(buf), 0, (struct sockaddr *)&addr, &addrlen) > 0)
     {
-      switch(buf[0]){
+      switch(buf[1]){
 
         case 0x00:
-          printf("received command ID: 0\n");
-          buf[0] = 0x01;
-          buf[1] = 0x02;
+          printf("received command ID: 00 (Connection check)\n");
+          buf[0] = 0x01; //payload length
+          buf[1] = 0x40; //MSG ID
           if (sendto(sock, buf, 2, 0, (struct sockaddr *)&addr, addrlen) < 0)
-  	    perror("sendto");
+       	    perror("sendto");
           break;
 
         case 0x01:
-          printf("received command ID: 1\n");
-          buf[0] = 0x03;
-          buf[1] = 0x04;
-          if (sendto(sock, buf, 2, 0, (struct sockaddr *)&addr, addrlen) < 0)
-      	    perror("sendto");
+          printf("received command ID: 01 (Number of nodes)\n");
+          buf[0] = 0x05; //payload length
+          buf[1] = 0x41; //MSG ID
+       	  buf[2] = 0x03; //Number of nodes
+ 	  buf[3] = 0x01; //ID1
+	  buf[4] = 0x02; //ID2
+	  buf[5] = 0x12; //ID3
+          if (sendto(sock, buf, 6, 0, (struct sockaddr *)&addr, addrlen) < 0)
+       	    perror("sendto");
           break;
 
         case 0x02:
-          printf("received command ID: 2\n");
-          buf[0] = 0x05;
-          buf[1] = 0x06;
+          printf("received command ID: 02 (Node datas)\n");
+          buf[0] = 0x14; //payload length
+          buf[1] = 0x42; //MSG ID
+	  buf[2] = 0x03; //Number of nodes
+	  buf[3] = 0x01; //Node iD1
+	  buf[4] = 0x01; //Type 1 Temp
+	  buf[5] = 0x00; //Val1		
+	  buf[6] = 0x18; //Val2
+ 	  buf[7] = 0x00; //Thres1
+	  buf[8] = 0x20; //Thres2
+	  buf[9] = 0x02; //Node iD2 Door
+	  buf[10] = 0x02; //Type
+	  buf[11] = 0x00; //Val1		
+	  buf[12] = 0x00; //Val2
+ 	  buf[13] = 0x00; //Thres1
+	  buf[14] = 0x01; //Thres2
+	  buf[15] = 0x12; //Node iD3 Distance
+	  buf[16] = 0x03; //Type
+	  buf[17] = 0x00; //Val1		
+	  buf[18] = 0x80; //Val2
+ 	  buf[19] = 0x00; //Thres1
+	  buf[20] = 0x70; //Thres2
+          if (sendto(sock, buf, 21, 0, (struct sockaddr *)&addr, addrlen) < 0)
+      	    perror("sendto");
+          break;
+
+        case 0x03:
+          printf("received command ID: 03 (Setting acknowledged)\n");
+          buf[0] = 0x01;
+          buf[1] = 0x43;
           if (sendto(sock, buf, 2, 0, (struct sockaddr *)&addr, addrlen) < 0)
        	    perror("sendto");
           break;
